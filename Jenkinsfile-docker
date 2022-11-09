@@ -51,6 +51,8 @@ pipeline {
         docker { image 'docker:dind' }
       }
       steps {
+        //sh 'docker -H tcp://172.31.19.149:2375 container stop myhello-world
+        //sh 'docker -H tcp://172.31.19.149:2375 container rm myhello-world
         sh 'docker -H tcp://172.31.19.149:2375 container run --detach --name myhello -p 80:8080 dbfan24/myhello-world:$BUILD_NUMBER'
       }
     }
