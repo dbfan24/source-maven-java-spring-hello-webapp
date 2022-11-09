@@ -27,20 +27,22 @@ pipeline {
     stage('Build Docker Image') {
       agent any
       steps {
-        sh 'docker image build myhello'
+        sh 'docker image build -t myhello-world .'
       }
     }
     stage('Tag Docker Image') {
       agent any
       steps {
-        sh 'docker image tag myhello dbfan24/myhello:$BUILD_NUMBER'
+        sh 'docker image tag myhello-world dbfan24/myhello-world:latest'
+        sh 'docker image tag myhello-world dbfan24/myhello-world:$BUILD_NUMBER'
       }
     }
     stage('Publish Docker Image') {
       agent any
       steps {
         withDockerRegistry(credentialsId: 'docker-hub-token', url: 'https://index.docker.io/v1/') {
-          sh 'docker image push dbfan24/myhello:$BUILD_NUMBER'
+          sh 'docker image push dbfan24/myhello-world:latest'
+          sh 'docker image push dbfan24/myhello-world:$BUILD_NUMBER'
         }
       }
     }
@@ -49,7 +51,7 @@ pipeline {
         docker { image 'docker:dind' }
       }
       steps {
-        sh 'docker -H tcp://172.31.19.149:2375 container run --detach --name myhello -p 80:8080 myhello:$BUILD_NUMBER'
+        sh 'docker -H tcp://172.31.19.149:2375 container run --detach --name myhello -p 80:8080 dbfan24/myhello-world:$BUILD_NUMBER'
       }
     }
   }
