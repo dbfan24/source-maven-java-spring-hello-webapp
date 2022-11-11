@@ -37,11 +37,11 @@ spec:
 '''
     }
   }
+  triggers {
+    //pollSCM('* * * * *')
+    githubPush()
+  }
   stages {
-    triggers {
-      //pollSCM('* * * * *')
-      githubPush()
-    }
     stage('Checkout') {
       steps {
         container('maven') {
