@@ -64,7 +64,7 @@ spec:
         githubUser = 'than.kim' //Ryan Jang
         githubEmail = 'than.kim@lge.com' //c1t1d0s7@example.com
         githubId = 'dbfan24' //c1t1d0s7 
-        githubRepo = 'jenkins-kube-deploy' //jenkins-kube-deploy
+        githubRepo = 'deploy-kube-object' //jenkins-kube-deploy
         githubURL = "https://github.com/${githubId}/${githubRepo}.git"
         dockerhubId = 'dbfan24' //c1t1d0s7
         dockerhubRepo = 'kaniko_test' //hello-world
