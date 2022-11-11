@@ -12,6 +12,12 @@ spec:
     - sleep
     args:
     - infinity
+  - name: git
+    image: alpine/git
+    command:
+    - sleep
+    args:
+    - infinity
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     command:
@@ -53,10 +59,28 @@ spec:
         }
       }
     }
-    stage('Build & Tag & Push Docker Image') {
+    stage('Update K8s Manifests & Push') {
+      environment {
+        githubUser = 'than.kim' //Ryan Jang
+        githubEmail = 'than.kim@lge.com' //c1t1d0s7@example.com
+        githubId = 'dbfan24' //c1t1d0s7 
+        githubRepo = 'jenkins-kube-deploy' //jenkins-kube-deploy
+        githubURL = "https://github.com/${githubId}/${githubRepo}.git"
+        dockerhubId = 'dbfan24' //c1t1d0s7
+        dockerhubRepo = 'kaniko_test' //hello-world
+      }
       steps {
-        container('kaniko') {
-          sh 'executor --context=dir:///home/jenkins/agent/workspace/kube_pipeline/ --destination=dbfan24/kaniko_test:$BUILD_NUMBER --destination=dbfan24/kaniko_test:latest'
+        container('git') {
+          git branch: 'main', credentialsId: 'github-credential', url: "${githubURL}"
+          sh "git config --global --add safe.directory ${workspace}"
+          sh "git config --global user.name ${githubUser}"
+          sh "git config --global user.email ${githubEmail}"
+          sh 'sed -i "s/image:.*/image: ${dockerhubId}\\/${dockerhubRepo}:${BUILD_NUMBER}/g" deployment.yaml'
+          sh 'git add deployment.yaml'
+          sh 'git commit -m "Jenkins Build Number - ${BUILD_NUMBER}"'
+          withCredentials([gitUsernamePassword(credentialsId: 'github-credential', gitToolName: 'Default')]) {
+            sh 'git push --set-upstream origin main'
+          }
         }
       }
     }
